@@ -7,6 +7,29 @@ app.use(express.json());
 
 let users=[];
 
+function Auth(req,res,next){
+    const token =req.headers.token;
+    try{
+        const deecoded=jwt.verify(token,JWT_SECRET);
+    if(deecoded.username){
+        req.username=deecoded.username;
+        next();
+    }else{
+        res.json({
+            message:"you are not logged in!"
+})
+    }
+    }catch(err){
+        res.status(404).json({message:"failed authenticate token"});
+    }
+    
+}
+
+function logger(req,res,next){
+    console.log(`${req.method} is used`);
+    next();
+}
+
 app.post("/signup",function(req,res){
     const username=req.body.username;
     const password=req.body.password;
@@ -20,6 +43,10 @@ app.post("/signup",function(req,res){
         message:"sign up successfully"
     })
 });
+
+app.get("/",(req,res)=>{
+    res.sendFile(__dirname+"/public/index.html");
+})
 
 app.post("/signin",function(req,res){
     const username=req.body.username;
@@ -40,25 +67,17 @@ app.post("/signin",function(req,res){
 })
 
 
-app.get("/me",function(req,res){
-    const token =req.headers.token;
-
-    const username1=jwt.verify(token,JWT_SECRET);
+app.get("/me",Auth,function(req,res){
 
     const user=users.find(function(e){
-        return (e.username == username1.username);
+        return (e.username === req.username);
     }) 
 
-    if(user){
+  
         res.status(200).json({
             username:user.username,
             password:user.password
         })
-    }else{
-        res.status(404).send({
-            message:"token invalid"
-        })
-    }
 })
 
 
