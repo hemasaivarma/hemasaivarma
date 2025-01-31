@@ -12,7 +12,7 @@ const userRouter=Router();
 userRouter.post("/signup",async (req,res)=>{
     const email=req.body.email;
     const name=req.body.name;
-    const password=req.body.password;
+    const password=req.body.password;   
 
     const hashpass=await bcrypt.hash(password,5);
 
@@ -54,5 +54,5 @@ userRouter.post("/login",async (req,res)=>{
 
 
 module.exports={
-    userRouter:userRouter
+    userRouter
 }

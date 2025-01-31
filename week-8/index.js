@@ -6,20 +6,24 @@ const {userRouter} =require("./routes/userroutes");
 const {adminRouter}=require("./routes/adminroute");
 const {courseRouter}=require("./routes/courseroute");
 
+mongoose.connect(process.env.connection);
+
 const app=express();
 app.use(express.json());
 
 
-app.use("/user",userRouter);
-app.use("/admin",adminRouter)
-app.use("/course",courseRouter);
+app.use("/index/user",userRouter);
+app.use("/index/admin",adminRouter)
+app.use("/index/course",courseRouter);
 
 
-function main(){
-    console.log("server connection started");
-    mongoose.connect(process.env.connection);
-    app.listen(3000);
-}
+
+app.listen(3000,()=>{
+    console.log("server is starting..");
+});
+    
+    
+
 
 
 

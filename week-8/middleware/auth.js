@@ -5,12 +5,12 @@ JWT_SEREAT=process.env.JWT_SECREAT;
 JWT_ADMIN=process.env.JWT_SECREAT_ADMIN;
 
 const userAuth=(req,res,next)=>{
-    const userId=req.headers.token;
+    const token=req.headers.token;
     try{
-        const userid=jwt.verify(userId,JWT_SEREAT);
+        const userid=jwt.verify(token,JWT_SEREAT);
 
     if(userid){
-        req.user=userid.id;
+        req.user=userid.user;
         next();
     }
     }catch(err){
@@ -23,7 +23,7 @@ const adminAuth=(req,res,next)=>{
     try{
         const adminId=jwt.verify(token,JWT_ADMIN);
         if(adminId){
-            req.admin=adminId.id;
+            req.admin=adminId.admin;
             next();
         }
     }catch(err){

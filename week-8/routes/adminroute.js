@@ -8,7 +8,7 @@ const { adminmodel, coursemodel } = require("../schema/admin");
 require("dotenv").config();
 JWT_ADMIN=process.env.JWT_SECREAT_ADMIN;
 
-adminRouter.post("/login",adminAuth,async (req,res)=>{
+adminRouter.post("/login",async (req,res)=>{
     const email=req.body.email;
     const password=req.body.password;
     
@@ -42,13 +42,13 @@ adminRouter.post("/signup",async (req,res)=>{
     const hashpass=await bcrypt.hash(password,5);
 
     try{
-        // const already=await adminmodel.findOne({
-        //     email:email
-        // })
-        // if(!already){
-        //     res.json({message:"user already exits"});
-        //     return;
-        // }
+        const already=await adminmodel.findOne({
+            email:email
+        })
+        if(already){
+            res.json({message:"user already exits"});
+            return;
+        }
 
         await adminmodel.create({
             email:email,
@@ -75,10 +75,11 @@ adminRouter.post("/course",adminAuth,async (req,res)=>{
                 price:price,
                 createdby:admin
             })
+            res.status(200).json({message:"course created success!",course:course});
         }catch(err){
             res.json({message:"error in created course"});
         }
-        res.status(200).json({message:"course created success!"});
+        
 })
 
 adminRouter.delete("/course",adminAuth,async (req,res)=>{
@@ -98,9 +99,9 @@ adminRouter.delete("/course",adminAuth,async (req,res)=>{
 
 adminRouter.get("/content",adminAuth,async (req,res)=>{
     const admin=req.admin;
-
+    let courses;
     try{
-        const courses=await coursemodel.find({createdby:admin});
+        courses=await coursemodel.find({createdby:admin});
         if(!courses){
             throw new Error("admin doesnt add any course");
         }
@@ -111,5 +112,5 @@ adminRouter.get("/content",adminAuth,async (req,res)=>{
 })
 
 module.exports={
-    adminRouter:adminRouter
+    adminRouter
 }

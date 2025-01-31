@@ -11,7 +11,7 @@ const User=new Schema({
 })
 
 const Purchase=new Schema({
-    courseid:[{type:ObjectId,required:true,ref:'Course'}],
+    courseid:[{type:ObjectId,ref:'courses'}],
     userid:{type:ObjectId,required:true}
 })
 

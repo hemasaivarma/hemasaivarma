@@ -1,23 +1,25 @@
 const {Router}=require("express");
 const courseRouter=Router();
 
+const jwt=require("jsonwebtoken");
 const {userAuth}=require("../middleware/auth");
 const {purchasemodel} =require("../schema/user");
 
-courseRouter.get("/purchase",userAuth,async (req,res)=>{
+courseRouter.post("/purchase",userAuth,async (req,res)=>{
     const userid=req.user;
     const courseid=req.body.courseid;
-
-    if(!courseid){
-        res.status(403).json({message:"provide course id"});
-    }
+    console.log(userid);
 
     try{
+        if(!courseid){
+            res.status(403).json({message:"provide course id"});
+            throw new Error("enter course id");
+        }
         const already=await purchasemodel.findOne({
             userid:userid,
             courseid:courseid,
         })
-        if(!already){
+        if(already){
             res.json({message:"already purchased course!"});
             return;
         }
@@ -26,22 +28,24 @@ courseRouter.get("/purchase",userAuth,async (req,res)=>{
             userid:userid,
             courseid:courseid
         })
+        res.status(200).json({message:"purchased successfully!",course:purchased});
     }catch(err){
-        res.status(403).json({message:'something went wrong'});
+        res.status(403).json({message:'something went wrong',err});
     }
-    res.status(200).json({message:"purchased successfully!",course:purchased});
+    
+    
 })
 
 courseRouter.get("/courses",userAuth,async (req,res)=>{
     const userid=req.user;
     try{
         const courses=await purchasemodel.find({userid:userid});
-        res.status(200).json({message:"fetched all courses",courses:courses.courseid})
+        res.status(200).json({message:"fetched all courses",courses:courses})
     }catch(err){
         res.status(403).json({message:"invalid user"});
     }
 })
 
 module.exports={
-    courseRouter:courseRouter
+    courseRouter
 }

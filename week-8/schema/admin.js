@@ -14,7 +14,7 @@ const Course=new Schema({
     title:{type:String,required:true},
     price:{type:Number,required:true},
     duration:{type:Number,required:true},
-    createdby:{type:ObjectId}
+    createdby:{type:ObjectId,ref:'admins'}
 })
 
 const adminmodel=mongoose.model("admins",Admin);
