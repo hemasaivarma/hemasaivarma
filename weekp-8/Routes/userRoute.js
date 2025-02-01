@@ -11,11 +11,12 @@ const {coursemodel}=require("../Schemas/admin");
 const bcrypt=require("bcrypt");
 const jwt=require("jsonwebtoken");
 
-userRouter.post("signup",async (req,res)=>{
+userRouter.post("/signup",async (req,res)=>{
     const username=req.body.username;
     const password=req.body.password;
 
     const hashpass=await bcrypt.hash(password,5);
+    console.log(hashpass);
     try{
         await usermodel.create({
             username:username,
@@ -24,12 +25,12 @@ userRouter.post("signup",async (req,res)=>{
         res.status(200).json({msg:"signup successfully"});
 
     }catch(err){
-        res.status(400).json({msg:"error in signup!"});    
+        res.status(400).json({msg:"error in signup!",err});    
     }
 
 })
 
-userRouter.post("login",async (req,res)=>{
+userRouter.post("/login",async (req,res)=>{
     const username=req.body.username;
     const password=req.body.password;
 
@@ -42,21 +43,21 @@ userRouter.post("login",async (req,res)=>{
             throw new Error("username is not register");
         }
         const comparepass=bcrypt.compare(password,user.password);
-
-        if(!comparepass){
+        console.log(comparepass)
+        if(comparepass){
+            const token=jwt.sign({
+                user:user._id.toString(),
+            },JWT_USER);
+        }else{
             throw new Error("invalid creditionals");
         }
-
-        const token=jwt.sign({
-            user:user._id.toString(),
-        },JWT_USER);
-        res.status(200).json({msg:"success of login",token:token});
+           res.status(200).json({msg:"success of login",token:token});
     }catch(err){
         res.status(403).json({msg:"error in signup",error:err});
     }
 })
 
-userRouter.get("courses",userAuth,async (req,res)=>{
+userRouter.get("/courses",userAuth,async (req,res)=>{
      try{
         const course=await coursemodel.find({});
         res.status(200).json({msg:"here are courses",courses:course});
@@ -65,39 +66,39 @@ userRouter.get("courses",userAuth,async (req,res)=>{
     }
 })
 
-userRouter.post("courses/:courseid",userAuth,async (req,res)=>{
+userRouter.post("/courses/:courseid",userAuth,async (req,res)=>{
     const user=req.user;
-    const courseid=req.body.courseid;
-
+    const courseid=req.params.courseid;
     try{
         if(!user){
             throw new Error("user not found!");
         }
-        const course=await coursemodel.findOne({courseid:courseid});
-
+        const course=await coursemodel.findById(courseid);
+        console.log(course);
         if(!course){
             throw new Error("course not found!");
         }
         const ispurchased=await purchasemodel.findOne({
             userid:user,
         })
+        console.log(ispurchased);
         if(ispurchased){
             ispurchased.courseid.push(courseid);
         }else{
             await purchasemodel.create({
                 userid:user,
-                courseid:courseid
+                courseid:course._id.toString()
             })
         }
 
         res.status(200).json({msg:"course purchased successfully"});
     }catch(err){
-        res.status(403).json({msg:"error in purchase",error:err});
+        res.status(403).json({msg:"error in purchase",err});
     }
 })
 
 
-userRouter.get("purchasedCourses",userAuth,async (req,res)=>{
+userRouter.get("/purchasedCourses",userAuth,async (req,res)=>{
     const user=req.user;
 
     try{
@@ -105,7 +106,7 @@ userRouter.get("purchasedCourses",userAuth,async (req,res)=>{
         if (!purchased){
             throw new Error("you dont purchased anything");
         }
-        res.status(200).json({purchased:purchased.courseid});
+        res.status(200).json({purchased:purchased});
     }catch(err){
         res.status(403).json({msg:"error in fetching purchased data"});
     }

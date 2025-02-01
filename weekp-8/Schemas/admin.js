@@ -11,10 +11,10 @@ const Course=new Schema({
     title:String,
     descrition:String,
     price:Number,
-    createdby:{type:ObjectId,ref:'admins'}
+    createdby:{type:ObjectId,ref:'admins1'}
 })
 
-const adminmodel=mongoose.model("admins",Admin);
-const coursemodel=mongoose.model("courses",Course);
+const adminmodel=mongoose.model("admins1",Admin);
+const coursemodel=mongoose.model("courses1",Course);
 
 module.exports={adminmodel,coursemodel};

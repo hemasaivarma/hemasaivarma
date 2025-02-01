@@ -10,8 +10,8 @@ const {adminRouter} =require("./Routes/adminRoute");
 
 app.use(express.json());
 
-app.use("/users/",userRouter);
-app.use("/admins/",adminRouter);
+app.use("/users",userRouter);
+app.use("/admins",adminRouter);
 
 app.listen(3000,()=>{
     console.log("server is running");

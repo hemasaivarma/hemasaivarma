@@ -8,12 +8,12 @@ const User=new Schema({
 })
 
 const Purchase=new Schema({
-    courseid:[{type:ObjectId,ref:'courses'}],
-    userid:{type:String,ref:'users'}
+    courseid:[{type:ObjectId,ref:'courses1'}],
+    userid:{type:ObjectId,ref:'users1'}
 })
 
-const usermodel=mongoose.model("users",User);
-const purchasemodel=mongoose.model("purchases",Purchase);
+const usermodel=mongoose.model("users1",User);
+const purchasemodel=mongoose.model("purchases1",Purchase);
 
 module.exports={
     usermodel,purchasemodel
